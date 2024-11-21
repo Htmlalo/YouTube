@@ -62,7 +62,12 @@ public class LoginServlet extends HomeServlet {
         JSONObject responseJson = new JSONObject();
         User user = userService.checkLogin(userName, password);
         if (user != null) {
-            if (user.getPassWord().equals(password)) {
+
+            if (user.getId().equals(userName) && !user.getPassWord().equals(password)) {
+                responseJson.put("success", false);
+                responseJson.put("message", "Sai mật khẩu");
+            }
+            if (user.getId().equals(userName.trim()) && user.getPassWord().equals(password)) {
                 responseJson.put("success", true);
                 XAuth.user = user;
                 session.setAttribute("account", user);
@@ -74,9 +79,6 @@ public class LoginServlet extends HomeServlet {
                 } else {
                     responseJson.put("pages", "/listVideo");
                 }
-            } else {
-                responseJson.put("success", false);
-                responseJson.put("message", "Đăng nhập thất bại");
             }
         }
         if (user == null) {
