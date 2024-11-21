@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+                                 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+             version="2.1">
+    <persistence-unit name="YouTuuBee-unit">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>model.User</class>
+        <class>model.Video</class>
+        <class>model.Favorite</class>
+        <class>model.Share</class>
+        <class>model.Logs</class>
+        <properties>
+            <property name="hibernate.connection.driver_class" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+            <property name="hibernate.connection.url"
+                      value="jdbc:sqlserver://localhost\\VANTHUAT:1433;databaseName=YouTuuBee;encrypt=true;sendStringParametersAsUnicode=true;trustServerCertificate=true;useUnicode=true;characterEncoding=UTF-8"/>
+            <property name="hibernate.connection.username" value="sa"/>
+            <property name="hibernate.connection.password" value="Vanthuat2511*"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            <property name="hibernate.order_inserts" value="true"/>
+        </properties>
+
+    </persistence-unit>
+</persistence>
