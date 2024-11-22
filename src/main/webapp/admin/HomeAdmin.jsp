@@ -168,7 +168,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="text-uppercase mb-1">Số lượng truy cập</div>
-                                <div class="h5 mb-0">${visitCount}</div>
+                                <div class="h5 mb-0">${applicationScope.visitCount}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-eye fa-2x text-info"></i>

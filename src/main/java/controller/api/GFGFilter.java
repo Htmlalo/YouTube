@@ -11,7 +11,7 @@ import util.XAuth;
 import java.io.IOException;
 
 
-@WebFilter({"/home/changAccount", "/home/changePassword", "/admin/*", "/login", "/register"})
+@WebFilter({"/home/changAccount", "/home/changePassword", "/login", "/register"})
 public class GFGFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -29,6 +29,7 @@ public class GFGFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String s = request.getRequestURI();
         HttpSession session = request.getSession();
+
         if (s.contains("/login") || s.contains("/register")) {
             if (XAuth.user != null) {
                 response.sendRedirect(request.getContextPath() + "/listVideo");

@@ -13,7 +13,7 @@
         <filter-name>LogFilter</filter-name>
         <filter-class>controller.api.LogFilter</filter-class>
     </filter>
-    
+
     <welcome-file-list>
         <welcome-file>listVideo</welcome-file>
     </welcome-file-list>

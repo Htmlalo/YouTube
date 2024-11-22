@@ -59,6 +59,7 @@ public class LoginServlet extends HomeServlet {
 
     public JSONObject checkLogin(String userName, String password, HttpServletRequest req) {
         HttpSession session = req.getSession();
+
         JSONObject responseJson = new JSONObject();
         User user = userService.checkLogin(userName, password);
         if (user != null) {

@@ -27,7 +27,7 @@ public class HomeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession();
+
         String path = req.getRequestURI().substring(req.getRequestURI().indexOf("/home") + "/home".length());
         switch (path) {
             case "/changAccount":
@@ -58,9 +58,5 @@ public class HomeServlet extends HttpServlet {
         super.doPost(req, resp);
     }
 
-    public void handListVideo(HttpServletRequest req, HttpSession session) {
-
-
-    }
 }
 
