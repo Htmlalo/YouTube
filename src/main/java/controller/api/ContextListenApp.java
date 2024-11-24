@@ -12,13 +12,14 @@ import java.io.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @WebListener
-public class MyAppListen implements ServletContextListener, HttpSessionListener {
-
+public class ContextListenApp implements ServletContextListener {
+    public static boolean sessionCreated = false;
     private static final String FILE_PATH = "/WEB-INF/visitor_count.txt";
-    private static final AtomicInteger visitCount = new AtomicInteger(0);
+    public static final AtomicInteger visitCount = new AtomicInteger(0);
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        sessionCreated = true;
         sce.getServletContext().setAttribute("visitCount", getVisitCount(sce));
     }
 
@@ -27,29 +28,12 @@ public class MyAppListen implements ServletContextListener, HttpSessionListener 
         incrementVisitorCount(sce);
     }
 
-    @Override
-    public void sessionCreated(HttpSessionEvent se) {
-        HttpSession session = se.getSession();
-
-        ServletContext context = session.getServletContext();
-        context.setAttribute("visitCount", visitCount.incrementAndGet());
-        System.out.println(session.getId());
-    }
-
-    @Override
-    public void sessionDestroyed(HttpSessionEvent se) {
-        System.out.println(se.getSession().getId());
-    }
-
 
     public void incrementVisitorCount(ServletContextEvent sce) {
-        String path = sce.getServletContext().getRealPath(FILE_PATH);
-
-        File file = new File(path);
+        File file = new File(sce.getServletContext().getRealPath(FILE_PATH));
         File parenDir = file.getParentFile();
         if (!parenDir.exists()) parenDir.mkdir();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(sce.getServletContext().getRealPath(FILE_PATH)))) {
-
             writer.write(String.valueOf(visitCount.get()));
         } catch (IOException e) {
             e.printStackTrace();

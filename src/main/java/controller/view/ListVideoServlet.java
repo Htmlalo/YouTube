@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet("/listVideo")
+@WebServlet({"/listVideo","/home/listVideo"})
 public class ListVideoServlet extends HttpServlet {
     private static VideoService videoService;
     private static final int pageSize = 8;
@@ -26,19 +26,21 @@ public class ListVideoServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        paginationPages(req,resp);
+        req.getRequestDispatcher("/home").forward(req, resp);
+    }
+
+
+    private void paginationPages(HttpServletRequest req, HttpServletResponse resp) {
         int sizePage = videoService.getTotalVideoCount(pageSize);
-
         int page = 1;
-
         String pageStr = req.getParameter("page");
-
         if (pageStr != null && !pageStr.isEmpty()) {
             try {
                 page = Integer.parseInt(pageStr);
             } catch (NumberFormatException ignored) {
             }
         }
-
         Map<Integer, List<Video>> listMap = videoService.getVideoToPages(page - 1, pageSize);
         if (page < 1) page = 1;
         if (page > sizePage) page = sizePage;
@@ -47,13 +49,9 @@ public class ListVideoServlet extends HttpServlet {
         for (Video video : listMap.get(page - 1)) {
             listDays.put(video.getId(), XTime.convertDateToDateNow(video.getPostedDate()));
         }
-
-
         req.setAttribute("currentPage", page);
         req.setAttribute("listVideos", listMap.get(page - 1));
         req.setAttribute("totalPages", sizePage);
         req.setAttribute("listDays", listDays);
-        req.getRequestDispatcher("/home/listVideo").forward(req, resp);
-
     }
 }

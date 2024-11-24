@@ -20,13 +20,11 @@ public class DetailVideoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-
         String id = req.getParameter("videoFindId");
         if (id != null && !id.isEmpty()) {
             System.out.println(videoRepository.findById(id).getDescription());
             req.setAttribute("video", videoRepository.findById(id));
         }
-
         req.getRequestDispatcher("/home/detailVideo?videoID=" + id).forward(req, resp);
 
     }

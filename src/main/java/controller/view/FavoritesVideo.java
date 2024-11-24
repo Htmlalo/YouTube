@@ -6,15 +6,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.User;
-import model.Video;
-import repository.VideoRepository;
-import service.FavoritesService;
-import service.Login.UserService;
 import service.VideoService;
-import util.XAuth;
 
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet("/favorites")
 public class FavoritesVideo extends HttpServlet {
@@ -31,7 +25,7 @@ public class FavoritesVideo extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        req.setAttribute("favoritesList",videoService.listVideoFavorites(XAuth.user));
+        req.setAttribute("favoritesList",videoService.listVideoFavorites((User) req.getSession().getAttribute("account")));
         req.getRequestDispatcher("home/favorites").forward(req, resp);
     }
 

@@ -6,12 +6,11 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import util.XAuth;
 
 import java.io.IOException;
 
 
-@WebFilter({"/home/changAccount", "/home/changePassword", "/login", "/register"})
+@WebFilter({"/home/changAccount", "/home/changePassword", "/login", "/register","/favorites","/admin/*"})
 public class GFGFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -31,14 +30,14 @@ public class GFGFilter implements Filter {
         HttpSession session = request.getSession();
 
         if (s.contains("/login") || s.contains("/register")) {
-            if (XAuth.user != null) {
+            if (request.getSession().getAttribute("account") != null) {
                 response.sendRedirect(request.getContextPath() + "/listVideo");
             } else {
                 filterChain.doFilter(servletRequest, servletResponse);
             }
             return;
         }
-        if (XAuth.user != null) {
+        if (request.getSession().getAttribute("account") != null) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -46,7 +45,6 @@ public class GFGFilter implements Filter {
 
         if (s.contains("/home")) {
             String pages = s.substring(s.indexOf("/home"));
-            System.out.println(123);
             session.setAttribute("recentPages", pages);
         }
     }

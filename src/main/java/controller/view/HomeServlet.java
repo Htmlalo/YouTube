@@ -6,14 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.Video;
 import repository.VideoRepository;
 
 import java.io.IOException;
-import java.net.http.HttpRequest;
-import java.util.List;
-import java.util.Map;
 
 @WebServlet("/home/*")
 public class HomeServlet extends HttpServlet {
@@ -27,7 +22,6 @@ public class HomeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         String path = req.getRequestURI().substring(req.getRequestURI().indexOf("/home") + "/home".length());
         switch (path) {
             case "/changAccount":
@@ -49,7 +43,6 @@ public class HomeServlet extends HttpServlet {
                 req.setAttribute("pages", "listVideo.jsp");
                 break;
         }
-
         req.getRequestDispatcher("/index.jsp").forward(req, resp);
     }
 

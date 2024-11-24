@@ -7,7 +7,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import util.XAuth;
 
 import java.io.IOException;
 
@@ -15,11 +14,11 @@ import java.io.IOException;
 public class LogOutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (XAuth.user != null) {
-            XAuth.user = null;
-            req.getSession().removeAttribute("account");
+
+        if (req.getSession().getAttribute("account") != null) {
+            req.getSession().invalidate();
         }
-        req.getRequestDispatcher("/listVideo").forward(req,resp);
+        req.getRequestDispatcher("/listVideo").forward(req, resp);
     }
 
     @Override
