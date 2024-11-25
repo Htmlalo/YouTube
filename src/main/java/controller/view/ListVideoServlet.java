@@ -16,7 +16,7 @@ import java.util.Map;
 
 @WebServlet({"/listVideo","/home/listVideo"})
 public class ListVideoServlet extends HttpServlet {
-    private static VideoService videoService;
+    private  VideoService videoService;
     private static final int pageSize = 8;
 
     @Override

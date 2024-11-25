@@ -6,7 +6,6 @@ import model.Video;
 import repository.FavoritesRepository;
 import repository.VideoRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +44,11 @@ public class VideoService {
     }
 
     public List<Video> listVideoFavorites(User user) {
-
         return videoRepository.getVideoFavoritesByUser(user);
+    }
+
+    public boolean updateViewCountVideo(String videoID) {
+
+        return videoRepository.updateViewCount(videoID);
     }
 }

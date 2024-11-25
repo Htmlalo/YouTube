@@ -11,65 +11,63 @@ import java.util.List;
 public class GenericRepositoryIml<T, ID> implements GenericRepository<T, ID> {
 
     private final Class<T> entityClass;
-
-
-    private final EntityManager entityManager = XEntityFactory.getEntity();
-
-
-    private EntityManager getEntityManager() {
-        if (entityManager == null || !entityManager.isOpen()) {
-            return XEntityFactory.getEntity();
-        }
-        return entityManager;
-    }
+    private static EntityManager entityManager;
 
     public GenericRepositoryIml(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 
+    protected EntityManager getEntityManager() {
+        if (entityManager == null || !entityManager.isOpen()) {
+            entityManager = XEntityFactory.getEntity();
+        }
+        return entityManager;
+    }
+
+    public void closeEntityManager() {
+        if (entityManager != null && entityManager.isOpen()) {
+            entityManager.close();
+            entityManager = null;
+        }
+    }
 
     @Override
     public T findById(ID id) {
-        return entityManager.find(entityClass, id);
+        return getEntityManager().find(entityClass, id);
     }
-
 
     @Override
     public List<T> findAll() {
-        return entityManager.createQuery("SELECT e FROM " + entityClass.getName() + " e", entityClass)
+        return getEntityManager().createQuery("SELECT e FROM " + entityClass.getName() + " e", entityClass)
                 .getResultList();
     }
 
-
     @Override
     public void save(T entity) {
-        executeTransaction(entityManager -> entityManager.persist(entity));
+        executeTransaction(em -> em.persist(entity));
     }
 
     @Override
     public void update(T entity) {
-        executeTransaction(entityManager -> entityManager.merge(entity));
+        executeTransaction(em -> em.merge(entity));
     }
 
     @Override
     public void delete(ID id) {
-        executeTransaction(entityManager -> {
-                    T entity = entityManager.find(entityClass, id);
-                    if (entity != null) entityManager.remove(entity);
-                }
-        );
+        executeTransaction(em -> {
+            T entity = em.find(entityClass, id);
+            if (entity != null) em.remove(entity);
+        });
     }
 
     @Override
     public boolean exists(Object ID) {
-        Long count = entityManager.createQuery("SELECT count(e) FROM " + entityClass.getName() + " e WHERE e." +
-                                getNameIDOfEntity(entityClass) + " = :id"
-                        , Long.class)
+        Long count = getEntityManager().createQuery("SELECT count(e) FROM " + entityClass.getName() + " e WHERE e." +
+                        getNameIDOfEntity(entityClass) + " = :id", Long.class)
                 .setParameter("id", ID)
                 .getSingleResult();
         return count > 0;
     }
-
 
     public String getNameIDOfEntity(Class<T> tClass) {
         Field[] fields = tClass.getDeclaredFields();
@@ -83,7 +81,6 @@ public class GenericRepositoryIml<T, ID> implements GenericRepository<T, ID> {
         return name;
     }
 
-
     public void executeTransaction(EntityManagerConsumer<T> action) {
         EntityTransaction transaction = getEntityManager().getTransaction();
         try {
@@ -96,9 +93,7 @@ public class GenericRepositoryIml<T, ID> implements GenericRepository<T, ID> {
                 throw e;
             }
         }
-
     }
-
 
     @FunctionalInterface
     interface EntityManagerConsumer<T> {

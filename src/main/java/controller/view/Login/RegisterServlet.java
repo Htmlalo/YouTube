@@ -10,10 +10,8 @@ import org.json.JSONObject;
 import service.Login.UserService;
 import util.XJson;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {

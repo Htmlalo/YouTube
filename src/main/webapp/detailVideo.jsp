@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Thêm vào phần head -->
+    <%--    <script src="https://www.youtube.com/iframe_api"></script>--%>
     <style>
         .video-container {
             position: relative;
@@ -75,6 +77,7 @@
             color: #666;
             line-height: 1.6;
         }
+
         .content-link {
             color: #0d6efd;
             text-decoration: none;
@@ -143,16 +146,7 @@
             <!-- Video Player -->
             <div class="video-container mb-3">
 
-                <iframe
-                        width="1280"
-                        height="720"
-                        src="${video.url}?autoplay=1"
-                        title="${video.title}"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        allow="autoplay; fullscreen">
-                </iframe>
+                <div id="player"></div>
 
             </div>
 
@@ -180,7 +174,7 @@
             <div class="card mb-4">
                 <div class="card-body description-section">
                     <h5 class="card-title mb-3">Description</h5>
-                    <c:set var="descriptionText" value="${video.description}" />
+                    <c:set var="descriptionText" value="${video.description}"/>
                     <%!
                         public String formatDescription(String text) {
                             if (text == null) return "";
@@ -198,7 +192,7 @@
                         }
                     %>
                     <div class="description">
-                        <%= formatDescription((String)pageContext.getAttribute("descriptionText")) %>
+                        <%= formatDescription((String) pageContext.getAttribute("descriptionText")) %>
                     </div>
                 </div>
             </div>
@@ -234,10 +228,64 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function likeVideo(id) {
-        const likeBtn = document.getElementById('likeBtn');
-        likeBtn.classList.toggle('active');
-        // Thêm code xử lý like video ở đây
+    var player;
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+
+    const videoID = '${video.url}'.split('/').pop();
+
+    function onYouTubeIframeAPIReady() {
+
+        player = new YT.Player('player', {
+            height: '720',
+            width: '1280',
+            videoId: videoID,
+            playerVars: {
+                'autoplay': 1,
+                'enablejsapi': 1,
+                'playsinline': 1
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    }
+
+    function onPlayerReady(event) {
+        event.target.playVideo();
+    }
+
+    var done = false;
+
+    function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) {
+            let intervalID = setInterval(function () {
+                let currentTime = player.getCurrentTime();
+                if (currentTime > 30) {
+                    updateViewCount();
+                    done = true;
+                    clearInterval(intervalID);
+                }
+            }, 100)
+        }
+    }
+
+    function updateViewCount() {
+        fetch(`${pageContext.request.contextPath}/detailVideo/updateCount?videoId=${video.id}`, {
+            'method': 'POST',
+        })
+            .then((response) => {
+                if (!response.status == 200) {
+                    console.log("Khong thành công");
+                } else {
+                    console.log(" thành công");
+                }
+            })
     }
 
     function shareVideo(id) {

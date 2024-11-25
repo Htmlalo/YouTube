@@ -1,7 +1,6 @@
 package repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import model.User;
 import model.Video;
 import util.XEntityFactory;
@@ -13,18 +12,16 @@ import java.util.Map;
 public class VideoRepository extends GenericRepositoryIml<Video, String> {
 
 
-    private final EntityManager entityManager;
-
     public VideoRepository() {
         super(Video.class);
-        this.entityManager = XEntityFactory.getEntity();
+
 
     }
 
 
     public List<Video> fillAllMaxResult(int pageNumber, int pageSize) {
         String hql = "FROM Video v  order by viewCount desc ";
-        TypedQuery<Video> query = entityManager.createQuery(hql, Video.class);
+        TypedQuery<Video> query = getEntityManager().createQuery(hql, Video.class);
         query.setFirstResult((pageNumber) * pageSize);
         query.setMaxResults(pageSize);
         return query.getResultList();
@@ -33,7 +30,7 @@ public class VideoRepository extends GenericRepositoryIml<Video, String> {
 
     public int getTotalVideoCount() {
         String hql = "SELECT COUNT(v) FROM  Video  v";
-        Long count = (Long) entityManager.createQuery(hql).getSingleResult();
+        Long count = (Long) getEntityManager().createQuery(hql).getSingleResult();
         return count.intValue();
     }
 
@@ -45,7 +42,22 @@ public class VideoRepository extends GenericRepositoryIml<Video, String> {
     }
 
     public List<Video> getVideoFavoritesByUser(User user) {
-        return entityManager.createQuery("select f.video from Favorite f where f.user=:User").setParameter("User", user).getResultList();
+        return getEntityManager().createQuery("select f.video from Favorite f where f.user=:User").setParameter("User", user).getResultList();
     }
+
+    public boolean updateViewCount(String videoID) {
+        EntityTransaction transaction = getEntityManager().getTransaction();
+        transaction.begin();
+        StoredProcedureQuery query = getEntityManager().createStoredProcedureQuery("UPVIEWCOUNT");
+        query.registerStoredProcedureParameter("videoID", String.class, ParameterMode.IN);
+        query.registerStoredProcedureParameter("rowCount", Boolean.class, ParameterMode.OUT);
+        query.setParameter("videoID", videoID);
+        query.execute();
+        boolean result = (Boolean) query.getOutputParameterValue("rowCount");
+        transaction.commit();
+        getEntityManager().refresh(findById(videoID));
+        return result;
+    }
+
 
 }
