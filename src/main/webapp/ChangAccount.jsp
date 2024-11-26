@@ -7,18 +7,23 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div class="update-profile-container">
+
     <div class="update-profile-form">
+
         <div class="form-header">
             <div class="profile-avatar">
                 <div class="avatar-preview">
-                    <img src="https://api.dicebear.com/6.x/initials/svg?seed=${sessionScope.user.username}" alt="Avatar" id="avatarImage">
+                    <img src="https://api.dicebear.com/6.x/initials/svg?seed=${sessionScope.account.fullName}"
+                         alt="Avatar" id="avatarImage">
                 </div>
             </div>
             <h2>Cập nhật tài khoản</h2>
             <p>Cập nhật thông tin cá nhân của bạn</p>
+
         </div>
 
-        <form action="${pageContext.request.contextPath}/updateProfile" method="POST" class="floating-labels-form">
+        <form id="changeAccountForm" class="floating-labels-form">
+
             <!-- Username Field -->
             <div class="form-group">
                 <div class="input-group">
@@ -26,8 +31,8 @@
                         <i class="fas fa-user"></i>
                     </div>
                     <div class="input-wrapper">
-                        <input type="text" id="username" name="username" required value="${sessionScope.user.username}">
-                        <label for="username">Tên đăng nhập</label>
+                        <input type="text" id="username" name="username" required value="${sessionScope.account.id}"
+                               placeholder="Tên Đăng nhập" disabled>
                         <div class="input-underline"></div>
                     </div>
                 </div>
@@ -40,8 +45,8 @@
                         <i class="fas fa-lock"></i>
                     </div>
                     <div class="input-wrapper">
-                        <input type="password" id="password" name="password" required>
-                        <label for="password">Mật khẩu</label>
+                        <input type="password" id="password" name="password"
+                               value="${sessionScope.account.passWord}" disabled>
                         <div class="input-underline"></div>
                         <i class="fas fa-eye toggle-password" data-target="password"></i>
                     </div>
@@ -55,7 +60,8 @@
                         <i class="fas fa-id-card"></i>
                     </div>
                     <div class="input-wrapper">
-                        <input type="text" id="fullname" name="fullname" required value="${sessionScope.user.fullname}">
+                        <input type="text" id="fullname" name="fullname" required
+                               value="${sessionScope.account.fullName}">
                         <label for="fullname">Họ và tên</label>
                         <div class="input-underline"></div>
                     </div>
@@ -69,7 +75,7 @@
                         <i class="fas fa-envelope"></i>
                     </div>
                     <div class="input-wrapper">
-                        <input type="email" id="email" name="email" required value="${sessionScope.user.email}">
+                        <input type="email" id="email" name="email" required value="${sessionScope.account.email}">
                         <label for="email">Địa chỉ email</label>
                         <div class="input-underline"></div>
                     </div>
@@ -87,6 +93,7 @@
                 </button>
             </div>
         </form>
+
     </div>
 </div>
 
@@ -99,6 +106,7 @@
     }
 
     .update-profile-form {
+        position: relative;
         background: #ffffff;
         padding: 40px;
         border-radius: 20px;
@@ -313,11 +321,17 @@
             flex-direction: column;
         }
     }
-</style>
 
+
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<!-- Animate CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 <script>
+
     document.querySelectorAll('.toggle-password').forEach(icon => {
-        icon.addEventListener('click', function() {
+        icon.addEventListener('click', function () {
             const targetId = this.getAttribute('data-target');
             const input = document.getElementById(targetId);
 
@@ -332,9 +346,76 @@
             }
         });
     });
+    // Handle form submission
+    document.getElementById('changeAccountForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Get form data
+        const formData = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            fullname: document.getElementById('fullname').value,
+            email: document.getElementById('email').value
+        };
+
+        fetch(`${pageContext.request.contextPath}/changeAccount`, {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: data.message || 'Thông tin tài khoản đã được cập nhật.',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        },
+                        timer: 3000,
+                        timerProgressBar: true
+                    }).then((result) => {
+                        if (
+                            result.dismiss === Swal.DismissReason.timer ||
+                            result.dismiss === Swal.DismissReason.backdrop ||
+                            result.dismiss === Swal.DismissReason.esc
+                        ) {
+                            // Reload page after successful update
+                            window.location.reload();
+                        }
+                    })
+                } else {
+                    throw new Error(data.message || 'Cập nhật thất bại');
+                }
+
+            }).catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: error.message || 'Có lỗi xảy ra khi cập nhật thông tin. Vui lòng thử lại sau.',
+                icon: 'error',
+                showConfirmButton: false,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                },
+                timer: 3000,
+                timerProgressBar: true
+            });
+        });
+    });
 
     // Add animation when form loads
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const form = document.querySelector('.update-profile-form');
         form.style.opacity = '0';
         form.style.transform = 'translateY(20px)';

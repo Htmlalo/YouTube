@@ -47,13 +47,13 @@
                                             </span>
                                         </div>
                                         <div class="mt-3 text-end">
-                                            <form action="${pageContext.request.contextPath}/favorites/remove"
-                                                  method="post">
+                                            <form action="${pageContext.request.contextPath}/favorites" method="post">
                                                 <input type="hidden" name="videoId" value="${video.id}">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                                     <i class="fas fa-trash-alt me-1"></i>Xóa
                                                 </button>
                                             </form>
+
                                         </div>
                                     </div>
                                 </div>
@@ -81,7 +81,7 @@
 
     .favorite-video-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .favorite-poster {

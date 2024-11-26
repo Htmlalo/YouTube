@@ -32,4 +32,13 @@ public class UserService {
         return userRepository.exists(userName);
     }
 
+    public boolean updateAccount(User user) {
+        try {
+            userRepository.update(user);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

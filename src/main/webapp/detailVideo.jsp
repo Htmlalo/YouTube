@@ -1,8 +1,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
+
+
 <html lang="vi">
 <head>
+    <%Boolean iLike = (Boolean) request.getAttribute("isLiked");%>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Detail</title>
@@ -301,6 +305,55 @@
             alert('Share URL: ' + shareUrl);
         }
     }
+
+    function likeVideo(videoId) {
+        const likeBtn = document.getElementById('likeBtn');
+        likeVideoOrUnlike();
+        // Toggle trạng thái active của nút
+        if (likeBtn.classList.contains('active')) {
+            likeBtn.classList.remove('active');
+            likeBtn.innerHTML = '<i class="bi bi-heart"></i><span>Like</span>';
+        } else {
+            likeBtn.classList.add('active');
+            likeBtn.innerHTML = '<i class="bi bi-heart-fill"></i><span>Liked</span>';
+        }
+
+        // Lưu trạng thái like vào localStorage
+
+    }
+
+    function likeVideoOrUnlike() {
+        fetch(`${pageContext.request.contextPath}/detailVideo/likeVideo?videoId=${video.id}`, {
+            'method': 'POST',
+        }).then((response) => {
+            if (!response.status == 200) {
+                console.log("Khong thông công");
+            } else {
+                console.log("Thành cong");
+            }
+        })
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        <% if (iLike != null && iLike) { %>
+        const likeBtn = document.getElementById('likeBtn')
+        likeBtn.classList.add('active');
+        likeBtn.innerHTML = '<i class="bi bi-heart-fill"></i><span>Liked</span>';
+        <% } %>
+    })
+
+
+    // Thêm hàm này để kiểm tra trạng thái like khi trang được tải
+    <%--document.addEventListener('DOMContentLoaded', function () {--%>
+    <%--    const videoId = '${video.id}'; // Lấy video ID từ JSP--%>
+    <%--    const likedVideos = JSON.parse(localStorage.getItem('likedVideos') || '[]');--%>
+
+    <%--    if (likedVideos.includes(videoId)) {--%>
+    <%--        const likeBtn = document.getElementById('likeBtn');--%>
+    <%--        likeBtn.classList.add('active');--%>
+    <%--        likeBtn.innerHTML = '<i class="bi bi-heart-fill"></i><span>Liked</span>';--%>
+    <%--    }--%>
+    <%--});--%>
 </script>
 </body>
 </html>

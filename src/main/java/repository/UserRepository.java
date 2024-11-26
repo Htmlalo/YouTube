@@ -9,4 +9,6 @@ public class UserRepository extends GenericRepositoryIml<User, String> {
         super(User.class);
     }
 
+
+
 }

@@ -46,7 +46,7 @@ public class LoginServlet extends HomeServlet {
         userService = new UserService();
     }
 
-    public JSONObject checkLogin(HttpServletRequest req) throws IOException {
+    private JSONObject checkLogin(HttpServletRequest req) throws IOException {
         Map<String, Object> map = XJson.parseJsonToMap(req);
         HttpSession session = req.getSession();
         JSONObject responseJson = new JSONObject();

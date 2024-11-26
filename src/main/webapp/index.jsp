@@ -343,12 +343,12 @@
             <span>Đăng ký</span></a>
     </div>
     <div class="nav-item-sidebar">
-        <a href="${pageContext.request.contextPath}/home/changAccount">
+        <a href="${pageContext.request.contextPath}/changeAccount">
             <i class="fas fa-user-edit"></i>
             <span>Thông tin tài khoản</span></a>
     </div>
     <div class="nav-item-sidebar">
-        <a href="${pageContext.request.contextPath}/home/changePassword">
+        <a href="${pageContext.request.contextPath}/changePassword">
             <i class="fas fa-lock"></i>
             <span>Đổi mật khẩu</span></a>
     </div>

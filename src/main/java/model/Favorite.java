@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -28,6 +29,11 @@ public class Favorite {
     @JoinColumn(name = "videoId", nullable = false)
     private Video video;
 
-    @Temporal(TemporalType.DATE)
-    private Date likeDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime likeDate;
+    @PrePersist
+    protected void positiveNumber() {
+
+        if (likeDate == null) likeDate = LocalDateTime.now();
+    }
 }

@@ -24,7 +24,7 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getRequestURI().substring(req.getRequestURI().indexOf("/home") + "/home".length());
         switch (path) {
-            case "/changAccount":
+            case "/changeAccount":
                 req.setAttribute("pages", "/ChangAccount.jsp");
                 break;
             case "/changePassword":
