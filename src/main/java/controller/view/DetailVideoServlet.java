@@ -12,13 +12,18 @@ import model.Video;
 import repository.VideoRepository;
 import service.FavoritesService;
 import service.VideoService;
+import util.XCookie;
+import util.XTime;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
-@WebServlet({"/detailVideo", "/detailVideo/updateCount","/detailVideo/likeVideo"})
+@WebServlet({"/detailVideo", "/detailVideo/updateCount", "/detailVideo/likeVideo"})
 public class DetailVideoServlet extends HttpServlet {
 
     private VideoService videoService;
@@ -29,18 +34,20 @@ public class DetailVideoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         User user = (User) req.getSession().getAttribute("account");
         String id = req.getParameter("videoFindId");
+        Video videoById = null;
+        if (id != null && !id.isEmpty()) {
+            videoById = videoService.getVideoByID(id);
+            req.setAttribute("listDays", convertDayOfWeek(id, videoById.getPostedDate()));
+
+        }
         List<Video> likedVideos = videoService.listVideoFavorites(user);
         if (user != null) {
             boolean isLiked = likedVideos.stream().anyMatch(v -> v.getId().equals(id));
             req.setAttribute("isLiked", isLiked);
         }
 
-        if (id != null && !id.isEmpty()) {
-            System.out.println(videoService.getVideoByID(id).getViewCount());
-
-            req.setAttribute("video", videoService.getVideoByID(id));
-
-        }
+        req.setAttribute("video", videoById);
+        req.setAttribute("recentVideos", recentVideos(req, resp, id));
         req.getRequestDispatcher("/home/detailVideo?videoID=" + id).forward(req, resp);
 
     }
@@ -68,6 +75,29 @@ public class DetailVideoServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_OK);
             }
         }
+    }
+
+
+    private List<Video> recentVideos(HttpServletRequest req, HttpServletResponse resp, String id) {
+        List<String> recentVideosId = XCookie.getListFromCookie(req, "recentVideos");
+        if (recentVideosId.isEmpty()) {
+            XCookie.addCookie(resp, "recentVideos", id, -1);
+        }
+        List<String> recentVideos = XCookie.getListFromCookie(req, "recentVideos");
+        List<Video> recentVideoList = new ArrayList<>();
+        for (String videoId : recentVideos) {
+            if (!videoId.equals(id)) {
+                recentVideoList.add(videoService.getVideoByID(videoId));
+            }
+        }
+        XCookie.updateListCookie(resp, req, "recentVideos", id, 5);
+        return recentVideoList;
+    }
+
+    private Map<String, String> convertDayOfWeek(String id, LocalDateTime time) {
+        Map<String, String> listDays = new HashMap<>();
+        listDays.put(id, XTime.convertDateToDateNow(time));
+        return listDays;
     }
 
     @Override

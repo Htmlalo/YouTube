@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 
-@WebFilter({"/home/changAccount", "/home/changePassword", "/login", "/register","/home/favorites","/admin/*"})
+@WebFilter({"/home/changAccount", "/home/changePassword", "/login", "/register","/home/favorites"})
 public class GFGFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

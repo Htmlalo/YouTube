@@ -19,6 +19,28 @@ public class VideoService {
         favoritesRepository = new FavoritesRepository();
     }
 
+    public boolean save(Video video) {
+        try {
+            videoRepository.save(video);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public boolean update(Video video) {
+        try {
+            videoRepository.update(video);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
     public List<Video> getAllVideo() {
         return videoRepository.findAll();
     }
@@ -39,8 +61,14 @@ public class VideoService {
         return videoRepository.exists(id);
     }
 
-    public void delete(String id) {
-        videoRepository.delete(id);
+    public boolean delete(String id) {
+        try {
+            videoRepository.delete(id);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public List<Video> listVideoFavorites(User user) {

@@ -375,4 +375,49 @@
             });
         });
     });
+
+
+    function formNotificationSuccess(message) {
+        Swal.fire({
+            title: 'Thành công!',
+            text: message || 'Mật khâẩu đã được thay đổi thành công.',
+            icon: 'success',
+            showConfirmButton: false,
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            },
+            timer: 3000,
+            timerProgressBar: true
+        }).then((result) => {
+            if (
+                result.dismiss === Swal.DismissReason.timer ||
+                result.dismiss === Swal.DismissReason.backdrop ||
+                result.dismiss === Swal.DismissReason.esc
+            ) {
+                // Reload page after successful update
+                window.location.reload();
+            }
+        })
+    }
+
+    function formNotificationError(message) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Lỗi!',
+            text: message || 'Có lỗi xảy ra khi cập nhật mật khẩu. Vui lòng thử lại sau.',
+            icon: 'error',
+            showConfirmButton: false,
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            },
+            timer: 3000,
+            timerProgressBar: true
+        });
+    }
 </script>

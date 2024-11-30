@@ -15,7 +15,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Thêm vào phần head -->
-    <%--    <script src="https://www.youtube.com/iframe_api"></script>--%>
+
     <style>
         .video-container {
             position: relative;
@@ -140,6 +140,10 @@
             color: #666;
             margin-bottom: 1rem;
         }
+
+        /*sharevideo*/
+
+
     </style>
 </head>
 <body>
@@ -173,11 +177,12 @@
                     <span>Share</span>
                 </button>
             </div>
-
+            <h5 class="card-title mb-3">${listDays[video.id]}</h5>
             <!-- Description -->
             <div class="card mb-4">
                 <div class="card-body description-section">
                     <h5 class="card-title mb-3">Description</h5>
+
                     <c:set var="descriptionText" value="${video.description}"/>
                     <%!
                         public String formatDescription(String text) {
@@ -208,7 +213,7 @@
             <!-- Recent Videos List -->
             <c:forEach var="recentVideo" items="${recentVideos}">
                 <div class="recent-video-card card mb-3">
-                    <a href="${pageContext.request.contextPath}/video?id=${recentVideo.id}"
+                    <a href="${pageContext.request.contextPath}/detailVideo?videoFindId=${recentVideo.id}"
                        class="text-decoration-none text-dark">
                         <div class="recent-video-thumbnail">
                             <img src="${recentVideo.poster}" alt="${recentVideo.title}">
@@ -218,7 +223,7 @@
                             <div class="d-flex gap-2 text-muted" style="font-size: 0.9rem;">
                                 <span>${recentVideo.viewCount} views</span>
                                 <span>•</span>
-                                <span>${recentVideo.uploadDate}</span>
+                                <span>${recentVideo.postedDate}</span>
                             </div>
                         </div>
                     </a>
@@ -227,7 +232,36 @@
         </div>
     </div>
 </div>
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel">Share Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label">Enter email addresses</label>
+                    <input type="text" class="form-control mb-2" id="emailInput"
+                           placeholder="Type email and press Enter">
+                    <div id="emailChips" class="d-flex flex-wrap gap-2">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="messageInput" class="form-label">Message (optional)</label>
+                    <textarea class="form-control" id="messageInput" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendShare()">Share</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+</body>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -264,18 +298,26 @@
         event.target.playVideo();
     }
 
+    let intervalID = null;
     var done = false;
 
     function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING && !done) {
-            let intervalID = setInterval(function () {
-                let currentTime = player.getCurrentTime();
-                if (currentTime > 30) {
-                    updateViewCount();
-                    done = true;
-                    clearInterval(intervalID);
-                }
-            }, 100)
+        if (event.data === YT.PlayerState.PLAYING && !done) {
+            if (!intervalID) { // Chỉ tạo setInterval nếu chưa tồn tại
+                intervalID = setInterval(function () {
+                    let currentTime = player.getCurrentTime();
+                    if (currentTime > 30) {
+                        done = true;
+                        clearInterval(intervalID);
+                        intervalID = null; // Reset intervalID
+                        updateViewCount();
+                    }
+                }, 100);
+            }
+        } else if (event.data !== YT.PlayerState.PLAYING) {
+            // Dừng theo dõi nếu không còn ở trạng thái PLAYING
+            clearInterval(intervalID);
+            intervalID = null;
         }
     }
 
@@ -292,18 +334,103 @@
             })
     }
 
+    // shareVideo
+    // Thay thế hàm shareVideo cũ
     function shareVideo(id) {
-        // Code xử lý share video
-        const shareUrl = window.location.href;
-        if (navigator.share) {
-            navigator.share({
-                title: '${video.title}',
-                url: shareUrl
-            });
-        } else {
-            // Fallback cho các trình duyệt không hỗ trợ Web Share API
-            alert('Share URL: ' + shareUrl);
+        const shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
+        shareModal.show();
+    }
+
+    let emails = [];
+
+    // Xử lý thêm email
+    document.getElementById('emailInput').addEventListener('keyup', function (e) {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            const email = this.value.trim().replace(',', '');
+            if (validateEmail(email) && !emails.includes(email)) {
+                emails.push(email);
+                updateEmailChips();
+            }
+            this.value = '';
         }
+    });
+
+    // Hàm validate email
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // Cập nhật hiển thị email chips
+    function updateEmailChips() {
+        console.log("Emails set:", emails);
+        const container = document.getElementById('emailChips');
+        console.log("Container:", container);
+        container.innerHTML = '';
+
+        emails.forEach((email) => {
+            console.log("Processing email:", email);
+            const chip = document.createElement('div');
+            chip.className = 'badge bg-primary d-flex align-items-center p-2 m-1';
+
+            const content = `
+            <span>${email}</span>
+            <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.5em;"></button>
+        `;
+            chip.innerHTML = content;
+            console.log("Created chip:", chip);
+
+            chip.querySelector('.btn-close').addEventListener('click', () => removeEmail(email));
+            container.appendChild(chip);
+        });
+    }
+
+    // Xóa email
+    function removeEmail(index) {
+        emails.splice(index, 1);
+        updateEmailChips();
+    }
+
+    // Gửi share
+    function sendShare() {
+        if (emails.length === 0) {
+            alert('Please add at least one email address');
+            return;
+        }
+
+        const message = document.getElementById('messageInput').value;
+        const videoData = {
+            videoId: '${video.id}',
+            emails: emails,
+            message: message
+        };
+
+        // Gửi request đến server
+        fetch(`${pageContext.request.contextPath}/share`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(videoData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Video shared successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('shareModal')).hide();
+                    // Reset form
+                    emails = [];
+                    updateEmailChips();
+                    document.getElementById('messageInput').value = '';
+                } else {
+                    alert('Failed to share video. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sharing the video.');
+            });
     }
 
     function likeVideo(videoId) {
@@ -343,6 +470,20 @@
     })
 
 
+    <%--function shareVideo(id) {--%>
+    <%--    // Code xử lý share video--%>
+    <%--    const shareUrl = window.location.href;--%>
+    <%--    if (navigator.share) {--%>
+    <%--        navigator.share({--%>
+    <%--            title: '${video.title}',--%>
+    <%--            url: shareUrl--%>
+    <%--        });--%>
+    <%--    } else {--%>
+    <%--        // Fallback cho các trình duyệt không hỗ trợ Web Share API--%>
+    <%--        alert('Share URL: ' + shareUrl);--%>
+    <%--    }--%>
+    <%--}--%>
+
     // Thêm hàm này để kiểm tra trạng thái like khi trang được tải
     <%--document.addEventListener('DOMContentLoaded', function () {--%>
     <%--    const videoId = '${video.id}'; // Lấy video ID từ JSP--%>
@@ -355,5 +496,4 @@
     <%--    }--%>
     <%--});--%>
 </script>
-</body>
 </html>
