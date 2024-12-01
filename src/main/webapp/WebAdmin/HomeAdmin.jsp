@@ -97,13 +97,8 @@
     <a href="${pageContext.request.contextPath}/manageUser" data-page="users">
         <i class="fas fa-users me-2"></i> Quản lý Người dùng
     </a>
-    <a href="${pageContext.request.contextPath}/admin/manageFavorites" data-page="favorites">
-        <i class="fas fa-heart me-2"></i> Quản lý Yêu thích
-    </a>
-    <a href="${pageContext.request.contextPath}/admin/manageShare" data-page="shares">
-        <i class="fas fa-share-alt me-2"></i> Quản lý Chia sẻ
-    </a>
-    <a href="${pageContext.request.contextPath}/admin/reportPage" data-page="reports">
+
+    <a href="${pageContext.request.contextPath}/mangeFavorites" data-page="reports">
         <i class="fas fa-chart-bar me-2"></i> Báo cáo & Thống kê
     </a>
 </div>

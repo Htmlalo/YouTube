@@ -59,5 +59,9 @@ public class VideoRepository extends GenericRepositoryIml<Video, String> {
         return result;
     }
 
+    public List<String> getAllVideoByTitle() {
+        EntityManager em = getEntityManager();
+        return em.createQuery("select v.title from Video v").getResultList();
+    }
 
 }

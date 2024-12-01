@@ -71,6 +71,10 @@ public class VideoService {
         }
     }
 
+    public List<String> getAllVideoByTitle() {
+        return videoRepository.getAllVideoByTitle();
+    }
+
     public List<Video> listVideoFavorites(User user) {
         return videoRepository.getVideoFavoritesByUser(user);
     }

@@ -25,4 +25,12 @@ public class FavoritesService {
     public void save(Favorite favorite) {
         favoritesRepository.save(favorite);
     }
+
+    public List<Object[]> getAllFavoriteVideo() {
+        return favoritesRepository.getAllFavoriteVideo();
+    }
+
+    public List<Object[]> getAllFavoriteUserByTitle(String title) {
+        return favoritesRepository.getAllFavoriteUserByTitle(title);
+    }
 }

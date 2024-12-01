@@ -8,10 +8,10 @@
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <div class="content-page">
-    <h2 class="mb-4">Quản lý Chia sẻ</h2>
+    <h2 class="mb-4">Quản lý Chia sẻ User</h2>
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Danh sách Video được chia sẻ</h5>
+            <h5 class="mb-0">Danh sách Chia sẻ User</h5>
             <button class="btn btn-primary">
                 <i class="fas fa-file-export me-2"></i>Xuất báo cáo
             </button>
@@ -46,13 +46,13 @@
 
                     </tr>
                     </thead>
-                    <tbody id="shareRow">
-                    <c:forEach var="share" items="${shareList}">
+                    <tbody id="favoriteRow">
+                    <c:forEach var="favorite" items="${favoriteUserList}">
                         <tr>
-                            <td>${share[0]}</td>
-                            <td>${share[1]}</td>
-                            <td>${share[2]}</td>
-                            <td>${share[3]}</td>
+                            <td>${favorite[0]}</td>
+                            <td>${favorite[1]}</td>
+                            <td>${favorite[2]}</td>
+                            <td>${favorite[3]}</td>
 
                         </tr>
                     </c:forEach>
@@ -64,7 +64,7 @@
 </div>
 <script>
     document.getElementById('search-button').addEventListener('click', function () {
-        fetch(`${pageContext.request.contextPath}/manageShare`, {
+        fetch(`${pageContext.request.contextPath}/manageFavoriteUser`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -78,10 +78,10 @@
                 console.log(123)
                 if (data.success) {
 
-                    const tableBody = document.getElementById('shareRow')
+                    const tableBody = document.getElementById('favoriteRow')
                     tableBody.innerHTML = '';
 
-                    data.shareList.forEach(share => {
+                    data.favoriteUserList.forEach(share => {
                         // Tạo một thẻ <tr>
                         const row = document.createElement('tr');
 

@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%--
   Created by IntelliJ IDEA.
   User: TVT
@@ -19,27 +20,23 @@
       <div class="table-responsive">
         <table class="table table-hover">
           <thead>
+
           <tr>
-            <th>ID Video</th>
             <th>Tiêu đề</th>
-            <th>Người yêu thích</th>
-            <th>Ngày yêu thích</th>
-            <th>Trạng thái</th>
-            <th>Hành động</th>
+            <th>Số Lượng thích</th>
+            <th>LastDate</th>
+            <th>Old Date</th>
           </tr>
           </thead>
           <tbody>
+<c:forEach var="favorite" items="${listFavorites}">
           <tr>
-            <td>1</td>
-            <td>Bootstrap Tutorial</td>
-            <td>Nguyễn Văn A</td>
-            <td>01/01/2024</td>
-            <td><span class="badge bg-success">Đang hoạt động</span></td>
-            <td>
-              <button class="btn btn-sm btn-info"><i class="fas fa-info-circle"></i></button>
-              <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-            </td>
+            <td>${favorite[0]}</td>
+            <td>${favorite[1]}</td>
+            <td>${favorite[2]}</td>
+            <td>${favorite[3]}</td>
           </tr>
+</c:forEach>
           </tbody>
         </table>
       </div>

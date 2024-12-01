@@ -6,29 +6,32 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<div id="reports" class="content-page">
-  <h2 class="mb-4">Báo cáo & Thống kê</h2>
-  <div class="row">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title mb-0">Thống kê lượt xem</h5>
-        </div>
-        <div class="card-body">
-          <canvas id="viewsChart"></canvas>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title mb-0">Thống kê người dùng</h5>
-        </div>
-        <div class="card-body">
-          <canvas id="usersChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .tab-content {
+        margin-top: 20px;
+    }
+
+    .security-section {
+        margin-top: 20px;
+    }
+
+    .security-section table {
+        width: 100%;
+    }
+</style>
+<div class="talk-bar">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item"><a class="nav-link active" id="favorites-tab" data-toggle="tab" href="${pageContext.request.contextPath}/mangeFavorites"
+                                role="tab" aria-controls="favorites" aria-selected="true">Favorites</a></li>
+        <li class="nav-item"><a class="nav-link" id="favorite-users-tab" data-toggle="tab" href="${pageContext.request.contextPath}/manageFavoriteUser"
+                                role="tab" aria-controls="favorite-users" aria-selected="false">Favorite Users</a></li>
+        <li class="nav-item"><a class="nav-link" id="shared-friends-tab" data-toggle="tab" href="${pageContext.request.contextPath}/manageShare"
+                                role="tab" aria-controls="shared-friends" aria-selected="false">Shared Friends</a></li>
+    </ul>
+    <jsp:include page="${pageReport}"></jsp:include>
 </div>
 

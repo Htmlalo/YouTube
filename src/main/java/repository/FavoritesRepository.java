@@ -1,14 +1,11 @@
 package repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import model.Favorite;
 import model.User;
 import model.Video;
-import org.hibernate.Transaction;
-import util.XEntityFactory;
 
 import java.util.List;
 
@@ -41,6 +38,21 @@ public class FavoritesRepository extends GenericRepositoryIml<Favorite, Long> {
         return result;
     }
 
+    public List<Object[]> getAllFavoriteVideo() {
+        EntityManager em = getEntityManager();
 
+        Query query = em.createQuery("SELECT v.title,count(f),max(f.likeDate),min(f.likeDate) from Video v  join  v.videoFavorites f group by v.title", Object[].class);
+        return query.getResultList();
+
+    }
+
+    public List<Object[]> getAllFavoriteUserByTitle(String title) {
+        EntityManager em = getEntityManager();
+        if (title == null) title = "";
+        String escapedTitle = title.replace("[", "\\[").replace("]", "\\]");
+        TypedQuery<Object[]> query = em.createQuery("select u.id,u.fullName,s.emails,s.shareDate from User u join u.userShares s where s.video.title like :title escape '\\'", Object[].class);
+        query.setParameter("title", "%" + escapedTitle + "%");
+        return query.getResultList();
+    }
 
 }

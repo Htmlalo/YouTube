@@ -274,7 +274,6 @@
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 
-
     const extractVideoID = (url) => {
         let videoID = null;
 
@@ -356,7 +355,7 @@
         shareModal.show();
     }
 
-    let emails = [];
+    const emails = [];
 
     // Xử lý thêm email
     document.getElementById('emailInput').addEventListener('keyup', function (e) {
@@ -386,17 +385,31 @@
 
         emails.forEach((email) => {
             console.log("Processing email:", email);
+
+            // Tạo div cho chip
             const chip = document.createElement('div');
             chip.className = 'badge bg-primary d-flex align-items-center p-2 m-1';
 
-            const content = `
-            <span>${email}</span>
-            <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.5em;"></button>
-        `;
-            chip.innerHTML = content;
+            // Tạo span cho email
+            const span = document.createElement('span');
+            span.textContent = email;
+
+            // Tạo nút đóng (btn-close)
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn-close btn-close-white ms-2';
+            button.style.fontSize = '0.5em';
+
+            // Gắn sự kiện xóa email khi nhấn nút đóng
+            button.addEventListener('click', () => removeEmail(email));
+
+            // Thêm các phần tử vào chip
+            chip.appendChild(span);
+            chip.appendChild(button);
+
             console.log("Created chip:", chip);
 
-            chip.querySelector('.btn-close').addEventListener('click', () => removeEmail(email));
+            // Thêm chip vào container
             container.appendChild(chip);
         });
     }
@@ -421,9 +434,10 @@
             message: message
         };
 
+
         // Gửi request đến server
-        fetch(`${pageContext.request.contextPath}/share`, {
-            method: 'POST',
+        fetch(`${pageContext.request.contextPath}/detailVideo`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -435,7 +449,7 @@
                     alert('Video shared successfully!');
                     bootstrap.Modal.getInstance(document.getElementById('shareModal')).hide();
                     // Reset form
-                    emails = [];
+                    emails.length = 0;
                     updateEmailChips();
                     document.getElementById('messageInput').value = '';
                 } else {
