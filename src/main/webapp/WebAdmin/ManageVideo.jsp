@@ -122,6 +122,81 @@
     .modal.show .modal-dialog {
         transform: scale(1);
     }
+
+    .poster-preview {
+        position: relative;
+        width: 100%;
+        max-width: 300px;
+        height: 200px;
+        border: 2px dashed #ced4da;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        margin-top: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .poster-preview::before {
+        content: 'Xem trước';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #6c757d;
+        opacity: 0.5;
+        z-index: 1;
+        transition: opacity 0.3s ease;
+    }
+
+    .poster-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+        z-index: 2;
+        position: relative;
+        transition: transform 0.3s ease;
+    }
+
+    .poster-preview:hover {
+        border-color: #86b7fe;
+    }
+
+    .poster-preview:hover::before {
+        opacity: 0.3;
+    }
+
+    .poster-preview:hover img {
+        transform: scale(1.05);
+    }
+
+    /* Hover overlay for remove */
+    .poster-preview .remove-preview {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 10;
+    }
+
+    .poster-preview:hover .remove-preview {
+        opacity: 1;
+    }
+
+    .poster-preview .remove-preview i {
+        color: #dc3545;
+    }
 </style>
 <div id="videos" class="content-page">
     <h2 class="mb-4">Quản lý Video</h2>
@@ -192,7 +267,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" action="video-update" method="POST" enctype="multipart/form-data">
+                    <form id="editForm" onsubmit="updateVideo(event)" enctype="multipart/form-data">
                         <input type="hidden" id="editVideoId" name="videoId">
                         <div class="mb-3">
                             <label class="form-label">Tiêu đề</label>
@@ -203,8 +278,21 @@
                             <input type="text" class="form-control" name="url" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Poster URL</label>
-                            <input type="text" class="form-control" name="poster">
+                            <label class="form-label">Nguồn Poster</label>
+                            <select class="form-select poster-source" name="posterSource">
+                                <option value="url">URL</option>
+                                <option value="file">Tải lên từ máy</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL Poster</label>
+                            <input type="text" class="form-control" name="poster"
+                                   placeholder="Nhập URL poster">
+                        </div>
+                        <div class="mb-3" style="display:none;">
+                            <label class="form-label">Chọn file Poster</label>
+                            <input type="file" accept="image/*" class="form-control" name="photo">
+                            <div class="poster-preview mt-2"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mô tả</label>
@@ -217,13 +305,10 @@
                                 <option value="false">Không hoạt động</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Chọn file</label>
-                            <input type="file" multiple accept="image/*" class="form-control" name="photo">
-                        </div>
+
                         <div class="text-end">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button id="updateVideo" type="submit" class="btn btn-primary">Cập nhật</button>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
                         </div>
                     </form>
                 </div>
@@ -240,7 +325,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="video-create" method="POST" enctype="multipart/form-data">
+                    <form id="createVideo" onsubmit="createVideo(event)" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label class="form-label">Tiêu đề</label>
                             <input id="titleCreate" type="text" class="form-control" name="title" required>
@@ -250,8 +335,21 @@
                             <input id="urlCreate" type="text" class="form-control" name="url" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Poster URL</label>
-                            <input id="posterUrlCreate" type="text" class="form-control" name="poster">
+                            <label class="form-label">Nguồn Poster</label>
+                            <select class="form-select poster-source" name="posterSource">
+                                <option value="url">URL</option>
+                                <option value="file">Tải lên từ máy</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL Poster</label>
+                            <input type="text" class="form-control" name="poster"
+                                   placeholder="Nhập URL poster">
+                        </div>
+                        <div class="mb-3" style="display:none;">
+                            <label class="form-label">Chọn file Poster</label>
+                            <input type="file" accept="image/*" class="form-control" name="photo">
+                            <div class="poster-preview mt-2"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mô tả</label>
@@ -265,13 +363,10 @@
                                 <option value="false">Không hoạt động</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Chọn file</label>
-                            <input type="file" multiple accept="image/*" class="form-control" name="photo">
-                        </div>
+
                         <div class="text-end">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button id="createVideo" type="submit" class="btn btn-primary">Thêm mới</button>
+                            <button type="submit" class="btn btn-primary">Thêm mới</button>
                         </div>
                     </form>
                 </div>
@@ -324,6 +419,130 @@
                 form.querySelector('input[name="url"]').value = url;
                 // Hiển thị modal
                 editModal.show();
+
+                function setupEditModalPosterPreview() {
+                    const editButtons = document.querySelectorAll('.edit-video-btn');
+                    editButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            // Lấy thẻ tr chứa dữ liệu video
+                            const videoRow = this.closest('tr');
+                            const poster = videoRow.querySelector('img').src;
+
+                            // Get the edit modal
+                            const editModal = document.getElementById('editModal');
+
+                            // Setup poster source dropdown
+                            const posterSourceSelect = editModal.querySelector('.poster-source');
+                            const urlInput = editModal.querySelector('input[name="poster"]');
+                            const fileInput = editModal.querySelector('input[name="photo"]');
+                            const previewContainer = editModal.querySelector('.poster-preview');
+
+                            // Set URL as default source
+                            posterSourceSelect.value = 'url';
+                            urlInput.value = poster;
+                            fileInput.value = ''; // Clear file input
+
+                            // Show URL input, hide file input
+                            urlInput.closest('.mb-3').style.display = 'block';
+                            fileInput.closest('.mb-3').style.display = 'none';
+
+                            // Create and set preview image
+                            if (previewContainer) {
+                                // Remove any existing preview images
+                                const existingImg = previewContainer.querySelector('img');
+                                if (existingImg) {
+                                    existingImg.remove();
+                                }
+
+                                // Create new preview image
+                                const previewImg = document.createElement('img');
+                                previewImg.src = poster;
+                                previewImg.alt = 'Poster Preview';
+                                previewImg.classList.add('img-fluid', 'rounded');
+                                previewContainer.appendChild(previewImg);
+
+                                // Add remove preview functionality
+                                addRemovePreviewHandler(editModal);
+                            }
+                        });
+                    });
+                }
+
+                // Function to add remove preview handler (reusable)
+                function addRemovePreviewHandler(modal) {
+                    const previewContainer = modal.querySelector('.poster-preview');
+                    if (previewContainer) {
+                        // Remove existing remove button if any
+                        const existingRemoveBtn = previewContainer.querySelector('.remove-preview');
+                        if (existingRemoveBtn) {
+                            existingRemoveBtn.remove();
+                        }
+
+                        // Create remove button
+                        const removeBtn = document.createElement('div');
+                        removeBtn.className = 'remove-preview';
+                        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                        removeBtn.addEventListener('click', function () {
+                            // Remove the image
+                            const img = previewContainer.querySelector('img');
+                            if (img) {
+                                img.remove();
+                            }
+
+                            // Reset inputs
+                            const posterSourceSelect = modal.querySelector('.poster-source');
+                            const urlInput = modal.querySelector('input[name="poster"]');
+                            const fileInput = modal.querySelector('input[type="file"][name="photo"]');
+
+                            if (posterSourceSelect) posterSourceSelect.value = 'url';
+                            if (urlInput) urlInput.value = '';
+                            if (fileInput) fileInput.value = '';
+
+                            // Trigger source change to update visibility
+                            const event = new Event('change');
+                            posterSourceSelect.dispatchEvent(event);
+                        });
+                        previewContainer.appendChild(removeBtn);
+                    }
+                }
+
+                // Setup poster source change handler for edit modal
+                function setupPosterSourceChangeHandler() {
+                    const sourceSelects = document.querySelectorAll('.poster-source');
+                    sourceSelects.forEach(select => {
+                        select.addEventListener('change', function () {
+                            const isUrl = this.value === 'url';
+                            const modalBody = this.closest('.modal-body');
+                            const urlInput = modalBody.querySelector('input[name="poster"]');
+                            const fileInput = modalBody.querySelector('input[name="photo"]');
+                            const urlGroup = urlInput.closest('.mb-3');
+                            const fileGroup = fileInput.closest('.mb-3');
+                            const previewContainer = modalBody.querySelector('.poster-preview');
+
+                            if (isUrl) {
+                                urlGroup.style.display = 'block';
+                                fileGroup.style.display = 'none';
+                                fileInput.value = ''; // Clear file input
+                            } else {
+                                urlGroup.style.display = 'none';
+                                fileGroup.style.display = 'block';
+                                urlInput.value = ''; // Clear URL input
+
+                                // Remove existing preview if switching to file
+                                if (previewContainer) {
+                                    const existingImg = previewContainer.querySelector('img');
+                                    if (existingImg) {
+                                        existingImg.remove();
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }
+
+                // Initial setup
+                setupEditModalPosterPreview();
+                setupPosterSourceChangeHandler();
             });
         });
 
@@ -347,33 +566,16 @@
         });
     });
 
-    document.getElementById('createVideo').addEventListener('click', function (e) {
-        createVideo(e)
-    });
 
     function createVideo(e) {
         e.preventDefault();
-        const form = document.querySelector('#createModal form');
-        const title = form.querySelector('input[name="title"]').value;
-        const url = form.querySelector('input[name="url"]').value;
-        const poster = form.querySelector('input[name="poster"]').value;
-        const description = form.querySelector('textarea[name="description"]').value;
-        const active = form.querySelector('select[name="active"]').value;
+        const form = document.getElementById('createVideo');
+        const formData = new FormData(form);
 
-        const data = {
-            title: title,
-            url: url,
-            poster: poster,
-            description: description,
-            active: active
-        };
 
         fetch(`${pageContext.request.contextPath}/manageVideo`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' // Set content type to JSON
-            },
-            body: JSON.stringify(data) // Convert the data to JSON format
+            body: formData // Convert the data to JSON format
         })
             .then(response => response.json()) // Parse the JSON response
             .then(data => {
@@ -390,9 +592,106 @@
             });
     }
 
-    document.getElementById('updateVideo').addEventListener('click', function (e) {
-        updateVideo(e);
+
+    // Modify the file input to trigger preview
+    const fileInputs = document.querySelectorAll('input[type="file"][name="photo"]');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            const previewContainer = this.closest('.modal-body').querySelector('.poster-preview');
+
+            if (file && previewContainer) {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    // Create preview image if it doesn't exist
+                    let previewImg = previewContainer.querySelector('img');
+                    if (!previewImg) {
+                        previewImg = document.createElement('img');
+                        previewImg.classList.add('img-fluid', 'rounded');
+                        previewContainer.appendChild(previewImg);
+                    }
+                    previewImg.src = reader.result;
+                    previewImg.style.maxWidth = '300px';
+                    previewImg.style.maxHeight = '200px';
+                    previewImg.style.objectFit = 'cover';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     });
+
+
+    const sourceSelects = document.querySelectorAll('.poster-source');
+    sourceSelects.forEach(select => {
+        select.addEventListener('change', function () {
+            const isUrl = this.value === 'url';
+            const modalBody = this.closest('.modal-body');
+            const urlInput = modalBody.querySelector('input[name="poster"]');
+            const fileInput = modalBody.querySelector('input[name="photo"]');
+            const urlGroup = urlInput.closest('.mb-3');
+            const fileGroup = fileInput.closest('.mb-3');
+
+            if (isUrl) {
+                urlGroup.style.display = 'block';
+                fileGroup.style.display = 'none';
+                fileInput.value = ''; // Clear file input
+            } else {
+                urlGroup.style.display = 'none';
+                fileGroup.style.display = 'block';
+                urlInput.value = ''; // Clear URL input
+            }
+        });
+    });
+
+
+    // Function to setup poster preview for edit modal
+    function setupEditModalPosterPreview() {
+        const editButtons = document.querySelectorAll('.edit-video-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Lấy thẻ tr chứa dữ liệu video
+                const videoRow = this.closest('tr');
+                const poster = videoRow.querySelector('img').src;
+
+                // Get the edit modal
+                const editModal = document.getElementById('editModal');
+
+                // Setup poster source dropdown
+                const posterSourceSelect = editModal.querySelector('.poster-source');
+                const urlInput = editModal.querySelector('input[name="poster"]');
+                const fileInput = editModal.querySelector('input[name="photo"]');
+                const previewContainer = editModal.querySelector('.poster-preview');
+
+                // Set URL as default source
+                posterSourceSelect.value = 'url';
+                urlInput.value = poster;
+                fileInput.value = ''; // Clear file input
+
+                // Show URL input, hide file input
+                urlInput.closest('.mb-3').style.display = 'block';
+                fileInput.closest('.mb-3').style.display = 'none';
+
+                // Create and set preview image
+                if (previewContainer) {
+                    // Remove any existing preview images
+                    const existingImg = previewContainer.querySelector('img');
+                    if (existingImg) {
+                        existingImg.remove();
+                    }
+
+                    // Create new preview image
+                    const previewImg = document.createElement('img');
+                    previewImg.src = poster;
+                    previewImg.alt = 'Poster Preview';
+                    previewImg.classList.add('img-fluid', 'rounded');
+                    previewContainer.appendChild(previewImg);
+
+                    // Add remove preview functionality
+                    addRemovePreviewHandler(editModal);
+                }
+            });
+        });
+    }
 
 
     const deleteBtn = document.querySelectorAll('.delete-video-btn')
@@ -431,29 +730,15 @@
     function updateVideo(e) {
         e.preventDefault();
 
-        const form = document.querySelector('#editModal form');
-        const title = form.querySelector('input[name="title"]').value;
-        const url = form.querySelector('input[name="url"]').value;
-        const poster = form.querySelector('input[name="poster"]').value;
-        const description = form.querySelector('textarea[name="description"]').value;
-        const active = form.querySelector('select[name="active"]').value;
-        const videoId = form.querySelector('input[name="videoId"]').value;
+        const form = document.getElementById('editForm');
 
-        const data = {
-            title: title,
-            url: url,
-            poster: poster,
-            description: description,
-            active: active,
-            videoId: videoId
-        };
+
+        const formData = new FormData(form);
+
 
         fetch(`${pageContext.request.contextPath}/manageVideo`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json' // Set content type to JSON
-            },
-            body: JSON.stringify(data) // Convert the data to JSON format
+            body: formData // Convert the data to JSON format
         })
             .then(response => response.json()) // Parse the JSON response
             .then(data => {
@@ -471,48 +756,6 @@
     }
 
 
-    function formNotificationSuccess(message) {
-        Swal.fire({
-            title: 'Thành công!',
-            text: message,
-            icon: 'success',
-            showConfirmButton: false,
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-            },
-            timer: 3000,
-            timerProgressBar: true
-        }).then((result) => {
-            if (
-                result.dismiss === Swal.DismissReason.timer ||
-                result.dismiss === Swal.DismissReason.backdrop ||
-                result.dismiss === Swal.DismissReason.esc
-            ) {
-                // Reload page after successful update
-                window.location.reload();
-            }
-        })
-    }
 
-    function formNotificationError(message) {
-        console.error('Error:', error);
-        Swal.fire({
-            title: 'Lỗi!',
-            text: message || 'Có lỗi xảy ra . Vui lòng thử lại sau.',
-            icon: 'error',
-            showConfirmButton: false,
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-            },
-            timer: 3000,
-            timerProgressBar: true
-        });
-    }
 
 </script>

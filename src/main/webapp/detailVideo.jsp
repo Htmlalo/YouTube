@@ -274,7 +274,22 @@
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 
-    const videoID = '${video.url}'.split('/').pop();
+
+    const extractVideoID = (url) => {
+        let videoID = null;
+
+        if (url.includes('youtube.com/watch')) {
+            // Xử lý URL dạng: https://www.youtube.com/watch?v=whkFt-HKTVg
+            const urlParams = new URLSearchParams(new URL(url).search);
+            videoID = urlParams.get('v'); // Lấy giá trị tham số 'v'
+        } else if (url.includes('youtube.com/embed/') || url.includes('youtu.be/')) {
+            // Xử lý URL dạng embed hoặc youtu.be: https://www.youtube.com/embed/whkFt-HKTVg
+            videoID = url.split('/').pop(); // Lấy phần cuối sau dấu '/'
+        }
+
+        return videoID;
+    };
+    const videoID = extractVideoID('${video.url}');
 
     function onYouTubeIframeAPIReady() {
 

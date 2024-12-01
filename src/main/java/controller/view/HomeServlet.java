@@ -12,13 +12,9 @@ import java.io.IOException;
 
 @WebServlet("/home/*")
 public class HomeServlet extends HttpServlet {
-    private  VideoRepository videoRepository;
-    private static final int pageSize = 8;
 
-    @Override
-    public void init() throws ServletException {
-        videoRepository = new VideoRepository();
-    }
+
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

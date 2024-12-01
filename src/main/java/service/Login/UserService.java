@@ -5,6 +5,8 @@ import lombok.Setter;
 import model.User;
 import repository.UserRepository;
 
+import java.util.List;
+
 @Getter
 @Setter
 
@@ -13,6 +15,19 @@ public class UserService {
 
     public UserService() {
         userRepository = new UserRepository();
+    }
+
+    public List<User> getAllUser() {
+        return userRepository.findAll();
+    }
+
+    public boolean delete(String id) {
+        try {
+            userRepository.delete(id);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public User checkLogin(String userName, String password) {

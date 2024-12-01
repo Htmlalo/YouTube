@@ -94,7 +94,7 @@
     <a href="${pageContext.request.contextPath}/manageVideo" data-page="videos">
         <i class="fas fa-video me-2"></i> Quản lý Video
     </a>
-    <a href="${pageContext.request.contextPath}/admin/manageUser" data-page="users">
+    <a href="${pageContext.request.contextPath}/manageUser" data-page="users">
         <i class="fas fa-users me-2"></i> Quản lý Người dùng
     </a>
     <a href="${pageContext.request.contextPath}/admin/manageFavorites" data-page="favorites">

@@ -20,7 +20,7 @@ public class VideoRepository extends GenericRepositoryIml<Video, String> {
 
 
     public List<Video> fillAllMaxResult(int pageNumber, int pageSize) {
-        String hql = "FROM Video v  order by viewCount desc ";
+        String hql = "FROM Video v  where v.active = true order by viewCount desc ";
         TypedQuery<Video> query = getEntityManager().createQuery(hql, Video.class);
         query.setFirstResult((pageNumber) * pageSize);
         query.setMaxResults(pageSize);
@@ -29,7 +29,7 @@ public class VideoRepository extends GenericRepositoryIml<Video, String> {
 
 
     public int getTotalVideoCount() {
-        String hql = "SELECT COUNT(v) FROM  Video  v";
+        String hql = "SELECT COUNT(v) FROM  Video  v where v.active = true";
         Long count = (Long) getEntityManager().createQuery(hql).getSingleResult();
         return count.intValue();
     }
